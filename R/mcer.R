@@ -118,3 +118,32 @@ calc_eigen_stat <- function(trans_mat){
         return(stat_vec)
     }
 }
+
+order_select <- function(mc_seq, m=3, print_report = T){
+    s <- length(unique(mc_seq))
+    n_obs <- length(mc_seq)
+    selection_citeria <- matrix(NA, nrow = (m-1), ncol= 3)
+    m_ll <- efficient_mc_er(mc_seq, m)$log_likelihood
+    for(k in 1:(m-1)){
+        k_ll <- efficient_mc_er(mc_seq, k)$log_likelihood
+        eta_k_m <- -2 * (k_ll - m_ll)
+        AIC_k <- eta_k_m - 2 * (s^m - s^k) * (s - 1)
+        BIC_k <- eta_k_m - (s^m - s^k) * (s - 1) * log(n_obs)
+        selection_citeria[k, ] <- c(k, AIC_k, BIC_k)
+    }
+    min_AIC <- min(selection_citeria[,2])
+    min_BIC <- min(selection_citeria[,3])
+    min_AIC_k <- which(selection_citeria[,2] == min_AIC)
+    min_BIC_k <- which(selection_citeria[,3] == min_BIC)
+    colnames(selection_citeria) <- c("Order", "AIC", "BIC")
+
+    if(print_report == T){
+        message(paste(rep('-', 79), collapse = ''))
+        message(paste('Base Order, m : ', m))
+        message(paste('Minimum AIC   : ', round(min_AIC,2), ', Est. Order = ', min_AIC_k, sep=''))
+        message(paste('Minimum BIC   : ', round(min_BIC,2), ', Est. Order = ', min_BIC_k, sep=''))
+        message(paste(rep('-', 79), collapse = ''))
+    }
+
+    return(selection_citeria)
+}

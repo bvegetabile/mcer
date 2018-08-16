@@ -12,7 +12,7 @@ CalcMarkovEntropyRate(
 chain <- sim_mc(tm, chain_length)
 chain <- ifelse(chain==1, 'A', 'B')
 # chain <- ifelse(rbinom(chain_length, 1, 0.25) == 1, 'C', chain)
-test_er <- mcer::efficient_mc_er(chain, 2)
+test_er <- mcer::efficient_mc_er(chain, 1)
 CalcMarkovEntropyRate(
     tm,
     sm
@@ -87,7 +87,7 @@ morder_seq <- function(mc_order, unique_states, trans_table, seq_len = 1000){
     samp_seq
 }
 
-ord <- 4
+ord <- 2
 testmat <- morder_transmat(ord, 1:ord)
 seq4 <- morder_seq(ord, 1:ord, testmat$trans_table, 1000)
 
@@ -104,6 +104,8 @@ mcer::efficient_mc_er(seq4, 9)$log_likelihood
 )
 plot(hmph)
 diff(hmph)
+
+order_select(seq4, 6)
 
 S <- seq(-1,1000,.1)
 plot(S, pchisq(S, 108))
