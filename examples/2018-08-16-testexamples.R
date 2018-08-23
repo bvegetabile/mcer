@@ -87,20 +87,20 @@ morder_seq <- function(mc_order, unique_states, trans_table, seq_len = 1000){
     samp_seq
 }
 
-ord <- 2
+ord <- 3
 testmat <- morder_transmat(ord, 1:ord)
 seq4 <- morder_seq(ord, 1:ord, testmat$trans_table, 1000)
 
 hmph <- c(
-mcer::efficient_mc_er(seq4, 1)$log_likelihood,
-mcer::efficient_mc_er(seq4, 2)$log_likelihood,
-mcer::efficient_mc_er(seq4, 3)$log_likelihood,
-mcer::efficient_mc_er(seq4, 4)$log_likelihood,
-mcer::efficient_mc_er(seq4, 5)$log_likelihood,
-mcer::efficient_mc_er(seq4, 6)$log_likelihood,
-mcer::efficient_mc_er(seq4, 7)$log_likelihood,
-mcer::efficient_mc_er(seq4, 8)$log_likelihood,
-mcer::efficient_mc_er(seq4, 9)$log_likelihood
+    mcer::efficient_mc_er(seq4, 1)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 2)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 3)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 4)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 5)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 6)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 7)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 8)$log_likelihood,
+    mcer::efficient_mc_er(seq4, 9)$log_likelihood
 )
 plot(hmph)
 diff(hmph)
