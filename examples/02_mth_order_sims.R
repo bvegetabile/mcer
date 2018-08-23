@@ -27,6 +27,15 @@ SimulateTwoOrder <- function(tm, n_sims=100, ss=c("11", "12", "21", "22")){
   return(mc_chain)
 }
 
+order_table <- function(orders){
+    out_tab <- matrix(NA, nrow=2, ncol=5)
+    for(i in 1:5){
+        out_tab[1, i] <- sum(orders[,1] == i)
+        out_tab[2, i] <- sum(orders[,2] == i)
+    }
+    out_tab
+}
+
 #-------------------------------------------------------------------------------
 # Plot to find valid pairs of p and a, as well as q and d ----------------------
 n <- 500
@@ -77,9 +86,9 @@ set.seed(124)
 n_sims <- 1000
 results_mat_sim1 <- matrix(NA, nrow=n_sims, ncol=6)
 state_space <- c('1', '2')
-order_mat <- matrix(NA, nrow = n_sims, ncol=2)
+order_mat1 <- matrix(NA, nrow = n_sims, ncol=2)
 for(i in 1:n_sims){
-  mcchain <- SimulateTwoOrder(so_test_one_sim1, 250)
+  mcchain <- SimulateTwoOrder(so_test_one_sim1, 1000)
   ent1 <- mcer::efficient_mc_er(mcchain, 1)
   ent2 <- mcer::efficient_mc_er(mcchain, 2)
   ent3 <- mcer::efficient_mc_er(mcchain, 3)
@@ -97,7 +106,7 @@ for(i in 1:n_sims){
                              ent4,
                              ent_aic$entropy_rate,
                              ent_bic$entropy_rate)[6:1]
-  order_mat[i,] <- c(aic_order, bic_order)
+  order_mat1[i,] <- c(aic_order, bic_order)
 }
 colnames(results_mat_sim1) <- c('m=1', 'm=2', 'm=3', 'SWLZ', 'AIC', 'BIC')[6:1]
 boxplot(results_mat_sim1, horizontal=T, ylim=c(0.25, 1))
@@ -210,26 +219,37 @@ boxplot(results_mat_sim3, horizontal=T, ylim=c(0, 1))
 abline(v=true_ent_sim3)
 apply(order_mat3, 2, table)
 
-
+barplot(order_table(order_mat1), beside = T, names.arg = 1:5)
 #-------------------------------------------------------------------------------
 # Plotting Simulation Results --------------------------------------------------
-# pdf('second_order_sims.pdf', height = 5, width=10)
-par(mfrow=c(2,1), mar=c(3,4,2,1)+0.1)
+pdf('/Users/bvegetabile/Dropbox/ucirvine/research/papers/2017_entropyrate/new_second_order_sims.pdf', height = 5, width=10)
+par(fig = c(0, 0.75, 0.5, 1), mar=c(3,4,2,1)+0.1)
 boxplot(results_mat_sim1, horizontal=T, ylim=c(0.25, 1), axes=F, pch=19,
         pars=list(outcol=rgb(0,0,0,0.25)),
         xlab='Entropy Rate Estimate\n',
         main=expression(paste('a = 0.1, c = 0.85, (a-c = -0.75) and d = 0.2, b = 0.933, (d-b = -.733)')))
 abline(v=true_ent_sim1, lty=3, lwd=2, col=rgb(0.75,0,0,1))
 axis(1, at=seq(0.3,1,0.1))
-axis(2, 1:4, labels = colnames(results_mat_sim1), las=2)
+axis(2, 1:6, labels = colnames(results_mat_sim1), las=2)
+par(fig = c(0.75, 1, 0.5, 1), mar=c(3,4,2,1)+0.1, new=T)
+barplot(order_table(order_mat1), beside = T,
+        names.arg = 1:5, legend.text = c("AIC", "BIC"), las=1, axes = F, args.legend = list(bty='n'),
+        main='Estimated Order')
+axis(2, las=2)
+par(fig = c(0, 0.75, 0, 0.5), mar=c(3,4,2,1)+0.1, new=T)
 boxplot(results_mat_sim2, horizontal=T, ylim=c(0.25,1), axes=F, pch=19,
         pars=list(outcol=rgb(0,0,0,0.25)),
         xlab='Entropy Rate Estimate\n',
         main=expression(paste('a = 0.52, c = 0.22 (a-c = 0.3) and d = 0.95, b = 0.6833, (d-b = 0.2667)')))
 abline(v = true_ent_sim2, lty=3, lwd=2, col=rgb(0.75,0,0,1))
 axis(1, at=seq(0.3,1,0.1))
-axis(2, 1:4, labels = colnames(results_mat_sim2), las=2)
-# dev.off()
+axis(2, 1:6, labels = colnames(results_mat_sim2), las=2)
+par(fig = c(0.75, 1, 0, 0.5), mar=c(3,4,2,1)+0.1, new=T)
+barplot(order_table(order_mat2), beside = T,
+        names.arg = 1:5, legend.text = c("AIC", "BIC"), las=1, axes = F, args.legend = list(bty='n'),
+        main='Estimated Order')
+axis(2, las=2)
+dev.off()
 #-------------------------------------------------------------------------------
 # Plotting Analytical Differences ----------------------------------------------
 plotEntropyDifference <- function(p, q,phi_res=100, gam_res=100, case_name=''){
